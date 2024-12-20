@@ -1,0 +1,32 @@
+﻿using MaintenanceApp.WPF.ViewModels;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Data;
+using System.Windows.Documents;
+using System.Windows.Input;
+using System.Windows.Media;
+using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
+using System.Windows.Shapes;
+
+namespace MaintenanceApp.WPF.Views
+{
+    /// <summary>
+    /// Interaction logic for AddDataWindow.xaml
+    /// </summary>
+    public partial class AddDataWindow : UserControl
+    {
+        public AddDataWindow()
+        {
+            InitializeComponent();
+            DataContext = new AddDataViewModel(
+                onSave: () => MessageBox.Show("تم الحفظ بنجاح!") ,
+                onCancel: () => MessageBox.Show("تم الإلغاء!"));
+        }
+    }
+}

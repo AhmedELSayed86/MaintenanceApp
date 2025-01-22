@@ -1,0 +1,1019 @@
+﻿<UserControl
+    x:Class="MaintenanceApp.WPF.Views.AddVisitDataWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:i="http://schemas.microsoft.com/xaml/behaviors"
+    xmlns:converters="clr-namespace:MaintenanceApp.WPF.Converters"
+    xmlns:local="clr-namespace:MaintenanceApp.WPF.Behaviors"
+    mc:Ignorable="d"
+    FlowDirection="RightToLeft"
+    FontSize="15">
+    <UserControl.Resources>
+        <!-- Converter for visibility -->
+        <converters:TextToVisibilityConverter
+            x:Key="TextToVisibilityConverter" />
+        <converters:BooleanToVisibilityConverter
+            x:Key="BooleanToVisibilityConverter" />
+    </UserControl.Resources>
+    <Grid
+        Margin="10">
+        <!-- Main Layout -->
+        <Grid.RowDefinitions>
+            <RowDefinition
+                Height="1*" />
+            <RowDefinition
+                Height="2*" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition
+                Width="2*" />
+            <ColumnDefinition
+                Width="1*" />
+        </Grid.ColumnDefinitions>
+        <!-- Table of Records -->
+        <Grid
+            Grid.Row="0"
+            Grid.ColumnSpan="2"
+            Margin="0,0,0,5">
+            <!-- جدول البيانات -->
+            <DataGrid
+                Grid.Row="1"
+                ItemsSource="{Binding FilteredSAPDataRecords}"
+                AutoGenerateColumns="False"
+                SelectedItem="{Binding SelectedSAPData, Mode=TwoWay}"
+                SelectionMode="Single"
+                IsReadOnly="True"
+                FlowDirection="RightToLeft"
+                Foreground="White"
+                FontSize="16"
+                FontWeight="Bold"
+                FontFamily="Times New Roman"
+                HeadersVisibility="Column"
+                ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                ScrollViewer.VerticalScrollBarVisibility="Auto"
+                CanUserAddRows="False"
+                Background="Black"
+                RowBackground="#111"
+                AlternatingRowBackground="#333"
+                BorderBrush="LightGreen"
+                BorderThickness="3"
+                HorizontalContentAlignment="Center"
+                VerticalContentAlignment="Center">
+                <!-- تحسين الهيدر -->
+                <DataGrid.ColumnHeaderStyle>
+                    <Style
+                        TargetType="DataGridColumnHeader">
+                        <Setter
+                            Property="Background"
+                            Value="Black" />
+                        <Setter
+                            Property="Foreground"
+                            Value="White" />
+                        <Setter
+                            Property="FontSize"
+                            Value="18" />
+                        <Setter
+                            Property="FontFamily"
+                            Value="Times New Roman" />
+                        <Setter
+                            Property="FontWeight"
+                            Value="Bold" />
+                        <Setter
+                            Property="HorizontalContentAlignment"
+                            Value="Center" />
+                        <Setter
+                            Property="Padding"
+                            Value="10,5" />
+                        <Setter
+                            Property="BorderBrush"
+                            Value="LightGreen" />
+                        <Setter
+                            Property="BorderThickness"
+                            Value="1" />
+                    </Style>
+                </DataGrid.ColumnHeaderStyle>
+                <!-- نمط الخلية مع خطوط الشبكة باللون الأخضر الفاتح -->
+                <DataGrid.CellStyle>
+                    <Style
+                        TargetType="DataGridCell">
+                        <Setter
+                            Property="BorderBrush"
+                            Value="LightGreen" />
+                        <Setter
+                            Property="BorderThickness"
+                            Value="1" />
+                        <Setter
+                            Property="Margin"
+                            Value="-1" />
+                        <Setter
+                            Property="FontSize"
+                            Value="14" />
+                        <Setter
+                            Property="FontFamily"
+                            Value="Times New Roman" />
+                        <Setter
+                            Property="FontWeight"
+                            Value="Bold" />
+                        <Setter
+                            Property="Height"
+                            Value="35" />
+                        <Setter
+                            Property="HorizontalContentAlignment"
+                            Value="Center" />
+                        <Setter
+                            Property="VerticalContentAlignment"
+                            Value="Center" />
+                    </Style>
+                </DataGrid.CellStyle>
+                <!-- الأعمدة المخصصة -->
+                <DataGrid.Columns>
+                    <DataGridTemplateColumn
+                        Header="Notification"
+                        Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBox
+                                    Padding="2"
+                                    IsReadOnly="True"
+                                    Background="#00000033"
+                                    Foreground="White"
+                                    SelectionBrush="Red"
+                                    HorizontalContentAlignment="Center"
+                                    VerticalContentAlignment="Center"
+                                    Text="{Binding  Notification }" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="NotificationType"
+                        Width="50">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Padding="2"
+                                    TextWrapping="Wrap"
+                                    TextAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding NotificationType}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="Region">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="Auto"
+                                    Padding="2"
+                                    TextAlignment="Center"
+                                    VerticalAlignment="Center"
+                                    Text="{Binding Region}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="City">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    Padding="2"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding City}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="Street">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    Padding="2"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding Street}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="ListName"
+                        Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Padding="2"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding ListName}"
+                                    TextWrapping="Wrap"
+                                    Background="#00000033"
+                                    Foreground="White" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="Telephone">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding Telephone}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="District">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding District}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="NotifDate">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding NotifDate}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="Description">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding Description}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="MainWorkCtr">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding MainWorkCtr}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="SortField">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding SortField}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="BreakdownDuration">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding BreakdownDuration}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                    <DataGridTemplateColumn
+                        Header="RequiredEnd">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock
+                                    Height="26"
+                                    Width="85"
+                                    VerticalAlignment="Center"
+                                    TextAlignment="Center"
+                                    Text="{Binding RequiredEnd}" />
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
+                </DataGrid.Columns>
+            </DataGrid>
+            <!-- Message if no records -->
+            <TextBlock
+                Text="لم يتم العثور على بلاغات"
+                Foreground="Red"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                FontSize="18"
+                Visibility="Collapsed" />
+            <!--Visibility="{Binding HasData, Converter={StaticResource BooleanToVisibilityConverter}}" />-->
+        </Grid>
+        <!-- Form for Adding New Record -->
+        <!-- Input Fields -->
+        <Border
+            Grid.Row="1"
+            BorderBrush="Yellow"
+            BorderThickness="2">
+            <Grid
+                Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="5*" />
+                    <RowDefinition
+                        Height="60" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="0">
+                    <!-- Visit Date -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="1*" />
+                            <ColumnDefinition
+                                Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Text="تاريخ الزيارة"
+                            Foreground="White"
+                            Margin="5"
+                            Grid.Column="0"
+                            VerticalAlignment="Center" />
+                        <DatePicker
+                            x:Name="VisitDateBox"
+                            Text="{Binding SelectedVisitData.VisitDate}"
+                            Margin="5"
+                            Grid.Column="1" />
+                    </Grid>
+                    <!-- Technician -->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="0.3*" />
+                            <ColumnDefinition
+                                Width="1*" />
+                            <ColumnDefinition
+                                Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Text="الفني"
+                            Grid.Column="0"
+                            Foreground="White"
+                            Margin="5"
+                            Height="30"
+                            VerticalAlignment="Center" />
+                        <StackPanel
+                            Margin="20"
+                            Grid.Column="2">
+                            <!-- TextBox للبحث -->
+                            <TextBox
+                                Text="{Binding EmployeeSearchKeyword, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                                Margin="0,0,0,10" />
+                            <!-- ComboBox لعرض الموظفين -->
+                            <ComboBox
+                                ItemsSource="{Binding FilteredEmployeeRecords}"
+                                SelectedItem="{Binding SelectedEmployee, Mode=TwoWay}"
+                                IsEditable="True"
+                                TextSearch.TextPath="Code"
+                                Margin="0,0,0,10">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <StackPanel
+                                            Orientation="Horizontal">
+                                            <TextBlock
+                                                Text="{Binding Code}" />
+                                            <TextBlock
+                                                Text="{Binding Name}" />
+                                        </StackPanel>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <!-- TextBox لعرض اسم الموظف -->
+                            <TextBox
+                                Text="{Binding EmployeeName, Mode=TwoWay}"
+                                IsReadOnly="True"
+                                Margin="0,0,0,10" />
+                        </StackPanel>
+                    </Grid>
+                    <!-- Service Details -->
+                    <StackPanel>
+                        <TextBlock
+                            Text="تفاصيل الخدمة"
+                            Foreground="White"
+                            Margin="5"
+                            Height="30"
+                            VerticalAlignment="Center" />
+                        <TextBox
+                            x:Name="ServiceDetailsBox"
+                            Text="{Binding SelectedVisitData.ServiceDetails, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="5"
+                            Height="100"
+                            TextWrapping="Wrap" />
+                    </StackPanel>
+                    <!-- Implemented -->
+                    <Grid>
+                        <TextBlock
+                            Text="التتميم"
+                            Foreground="White"
+                            Margin="10,0,0,0"
+                            VerticalAlignment="Center" />
+                        <ComboBox
+                            x:Name="ImplementedBox"
+                            Text="{Binding SelectedVisitData.Implemented, UpdateSourceTrigger=PropertyChanged}"
+                            IsEditable="True"
+                            Margin="50,0,0,5"
+                            Height="30" />
+                    </Grid>
+                    <!-- Cost -->
+                    <Grid>
+                        <TextBlock
+                            Text="التكلفة"
+                            Foreground="White"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center" />
+                        <TextBox
+                            x:Name="CostBox"
+                            Height="30"
+                            Text="{Binding SelectedVisitData.Cost, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="50,0,0,5" />
+                    </Grid>
+                    <!-- Paid مدفوع-->
+                    <Grid>
+                        <TextBlock
+                            Text="مدفوع"
+                            Foreground="White"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center" />
+                        <TextBox
+                            x:Name="PaidBox"
+                            Text="{Binding SelectedVisitData.Paid, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="50,0,0,5"
+                            Height="30" />
+                    </Grid>
+                    <!-- Unpaid-->
+                    <Grid>
+                        <TextBlock
+                            Text="غير مدفوع"
+                            Foreground="Gray"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center" />
+                        <TextBox
+                            x:Name="UnpaidBox"
+                            Text="{Binding SelectedVisitData.Unpaid, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="70,0,0,5"
+                            Height="30" />
+                    </Grid>
+                    <!--DiscountPercentage-->
+                    <Grid>
+                        <TextBlock
+                            Text="نسبة الخصم %"
+                            Foreground="Gray"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center" />
+                        <TextBox
+                            x:Name="DiscountPercentagetBox"
+                            Text="{Binding SelectedVisitData.DiscountPercentaget, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="90,0,0,5"
+                            Height="30" />
+                    </Grid>
+                    <!-- Payment Refused -->
+                    <Grid>
+                        <CheckBox
+                            Content="رفض الدفع"
+                            Foreground="IndianRed"
+                            IsChecked="{Binding SelectedVisitData.PaymentRefused}"
+                            HorizontalAlignment="Left"
+                            FlowDirection="LeftToRight"
+                            Margin="5"
+                            Height="30" />
+                    </Grid>
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="0"
+                    Grid.Column="1">
+                    <!--DistributionStatus-->
+                    <Grid>
+                        <TextBox
+                            x:Name="DistributionStatusBox"
+                            Text="{Binding SelectedVisitData.DistributionStatus, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="5"
+                            Height="30" />
+                        <TextBlock
+                            Text="حالة التوزيع"
+                            Foreground="Gray"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding Text, ElementName=DistributionStatusBox, Converter={StaticResource TextToVisibilityConverter}}" />
+                    </Grid>
+                    <!-- Notes -->
+                    <Grid>
+                        <TextBox
+                            x:Name="NotesBox"
+                            Text="{Binding SelectedVisitData.Notes, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="5"
+                            Height="30" />
+                        <TextBlock
+                            Text="ملاحظات"
+                            Foreground="Gray"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding Text, ElementName=NotesBox, Converter={StaticResource TextToVisibilityConverter}}" />
+                    </Grid>
+                    <!--AssistantTechnician-->
+                    <Grid>
+                        <TextBox
+                            x:Name="AssistantTechnicianBox"
+                            Text="{Binding SelectedVisitData.AssistantTechnician, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="5"
+                            Height="30" />
+                        <TextBlock
+                            Text="فني التحديد"
+                            Foreground="Gray"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding Text, ElementName=AssistantTechnicianBox, Converter={StaticResource TextToVisibilityConverter}}" />
+                    </Grid>
+                    <!--DeterminationTechnician-->
+                    <Grid>
+                        <TextBox
+                            x:Name="DeterminationTechniciantBox"
+                            Text="{Binding SelectedVisitData.DeterminationTechniciant, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="5"
+                            Height="30" />
+                        <TextBlock
+                            Text="الفني المساعد"
+                            Foreground="Gray"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding Text, ElementName=DeterminationTechniciantBox, Converter={StaticResource TextToVisibilityConverter}}" />
+                    </Grid>
+                    <!--InstallationDate-->
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition
+                                Width="1*" />
+                            <ColumnDefinition
+                                Width="2*" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock
+                            Text="تاريخ التركيب"
+                            Foreground="White"
+                            Margin="5"
+                            Height="30"
+                            Grid.Column="0"
+                            VerticalAlignment="Center" />
+                        <DatePicker
+                            x:Name="InstallationDatetBox"
+                            Text="{Binding SelectedVisitData.VisitDate}"
+                            Margin="5"
+                            Height="30"
+                            Grid.Column="1" />
+                    </Grid>
+                    <!--ExecutionDuration-->
+                    <Grid>
+                        <TextBox
+                            x:Name="ExecutionDurationtBox"
+                            Text="{Binding SelectedVisitData.ExecutionDurationt, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="5"
+                            Height="30" />
+                        <TextBlock
+                            Text="مدة التنفيذ"
+                            Foreground="Gray"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding Text, ElementName=ExecutionDurationtBox, Converter={StaticResource TextToVisibilityConverter}}" />
+                    </Grid>
+                    <!--WarrantyStatus-->
+                    <Grid>
+                        <ComboBox
+                            x:Name="WarrantyStatustBox"
+                            Text="{Binding SelectedVisitData.WarrantyStatust, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="5"
+                            Height="30"
+                            IsEditable="True" />
+                        <TextBlock
+                            Text="حالة الضمان"
+                            Foreground="Gray"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding Text, ElementName=WarrantyStatustBox, Converter={StaticResource TextToVisibilityConverter}}" />
+                    </Grid>
+                    <!--UserStatus-->
+                    <Grid>
+                        <ComboBox
+                            x:Name="UserStatustBox"
+                            Text="{Binding SelectedVisitData.UserStatust, UpdateSourceTrigger=PropertyChanged}"
+                            Margin="5"
+                            IsEditable="True"
+                            Height="30" />
+                        <TextBlock
+                            Text="حالة البلاغ"
+                            Foreground="White"
+                            Margin="10,0,0,0"
+                            Height="30"
+                            VerticalAlignment="Center"
+                            IsHitTestVisible="False"
+                            Visibility="{Binding Text, ElementName=UserStatustBox, Converter={StaticResource TextToVisibilityConverter}}" />
+                    </Grid>
+                </StackPanel>
+                <!-- Action Buttons -->
+                <Border
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    BorderBrush="YellowGreen"
+                    BorderThickness="2">
+                    <WrapPanel
+                        Grid.Row="1"
+                        Grid.ColumnSpan="2"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Left"
+                        Margin="0,0,0,0">
+                        <Button
+                            Content="توزيع"
+                            Command="{Binding AddVisitDataCommand}"
+                            Margin="3"
+                            Width="100" />
+                        <Button
+                            Content="حفظ"
+                            Command="{Binding AddVisitDataCommand}"
+                            Margin="3"
+                            Width="100" />
+                        <Button
+                            Content="إلغاء"
+                            Command="{Binding UpdateVisitDataCommand}"
+                            Margin="3"
+                            Width="100" />
+                        <Button
+                            Content="إلغاء"
+                            Command="{Binding DeleteVisitDataCommand}"
+                            Margin="3"
+                            Width="100" />
+                        <Button
+                            Content="تحميل المزيد"
+                            Margin="3"
+                            Command="{Binding  }" />
+                        <Button
+                            Content="إضافة SAP Data"
+                            Margin="3"
+                            Command="{Binding  }" />
+                        <Button
+                            Content="إضافة Visit Data"
+                            Margin="3"
+                            Command="{Binding AddVisitDataCommand}" />
+                        <Button
+                            Content="تحديث Visit Data"
+                            Margin="3"
+                            Command="{Binding UpdateVisitDataCommand}" />
+                        <Button
+                            Content="حذف Visit Data"
+                            Margin="3"
+                            Command="{Binding DeleteVisitDataCommand}" />
+                        <Button
+                            Content="تحميل البيانات المرتبطة"
+                            Margin="3"
+                            Command="{Binding  }" />
+                    </WrapPanel>
+                </Border>
+            </Grid>
+        </Border>
+        <Border
+            Grid.Row="1"
+            Grid.Column="1"
+            BorderBrush="Green"
+            BorderThickness="2">
+            <Grid
+                Grid.Row="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition
+                        Height="40" />
+                    <RowDefinition
+                        Height="2*" />
+                    <RowDefinition
+                        Height="40" />
+                    <RowDefinition
+                        Height="1*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition
+                        Width="*" />
+                    <ColumnDefinition
+                        Width="*" />
+                </Grid.ColumnDefinitions>
+                <!-- تحميل المزيد -->
+                <!-- أدوات الفلترة -->
+                <StackPanel
+                    Orientation="Horizontal"
+                    Grid.Row="0"
+                    Grid.ColumnSpan="2">
+                    <TextBox
+                        x:Name="FilterTextBox"
+                        Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
+                        Width="200"
+                        Margin="3" />
+                    <Button
+                        Content="Apply Filter"
+                        Command="{Binding  }"
+                        Margin="3" />
+                    <Button
+                        Content="Load Linked Data"
+                        Command="{Binding }"
+                        Margin="3" />
+                    <Button
+                        Content="Load More"
+                        Command="{Binding  }"
+                        HorizontalAlignment="Center"
+                        Margin="3" />
+                </StackPanel>
+                <DataGrid
+                    ItemsSource="{Binding  LinkedVisitDatasToSAPDatasRecords}"
+                    AutoGenerateColumns="False"
+                    Margin="5"
+                    Grid.Row="1"
+                    Grid.ColumnSpan="2"
+                    SelectionMode="Single"
+                    IsReadOnly="True"
+                    FlowDirection="RightToLeft"
+                    Foreground="White"
+                    FontSize="12"
+                    FontWeight="Bold"
+                    FontFamily="Times New Roman"
+                    HeadersVisibility="Column"
+                    ScrollViewer.HorizontalScrollBarVisibility="Auto"
+                    ScrollViewer.VerticalScrollBarVisibility="Auto"
+                    CanUserAddRows="False"
+                    Background="Black"
+                    RowBackground="#111"
+                    AlternatingRowBackground="#333"
+                    BorderBrush="LightGreen"
+                    BorderThickness="3"
+                    HorizontalContentAlignment="Center"
+                    VerticalContentAlignment="Center">
+                    <!-- تحسين الهيدر -->
+                    <DataGrid.ColumnHeaderStyle>
+                        <Style
+                            TargetType="DataGridColumnHeader">
+                            <Setter
+                                Property="Background"
+                                Value="Black" />
+                            <Setter
+                                Property="Foreground"
+                                Value="White" />
+                            <Setter
+                                Property="FontSize"
+                                Value="14" />
+                            <Setter
+                                Property="FontFamily"
+                                Value="Times New Roman" />
+                            <Setter
+                                Property="FontWeight"
+                                Value="Bold" />
+                            <Setter
+                                Property="HorizontalContentAlignment"
+                                Value="Center" />
+                            <Setter
+                                Property="Padding"
+                                Value="10,5" />
+                            <Setter
+                                Property="BorderBrush"
+                                Value="LightGreen" />
+                            <Setter
+                                Property="BorderThickness"
+                                Value="1" />
+                        </Style>
+                    </DataGrid.ColumnHeaderStyle>
+                    <!-- نمط الخلية مع خطوط الشبكة باللون الأخضر الفاتح -->
+                    <DataGrid.CellStyle>
+                        <Style
+                            TargetType="DataGridCell">
+                            <Setter
+                                Property="BorderBrush"
+                                Value="LightGreen" />
+                            <Setter
+                                Property="BorderThickness"
+                                Value="1" />
+                            <Setter
+                                Property="Margin"
+                                Value="-1" />
+                            <Setter
+                                Property="FontSize"
+                                Value="14" />
+                            <Setter
+                                Property="FontFamily"
+                                Value="Times New Roman" />
+                            <Setter
+                                Property="FontWeight"
+                                Value="Bold" />
+                            <Setter
+                                Property="Height"
+                                Value="40" />
+                            <Setter
+                                Property="HorizontalContentAlignment"
+                                Value="Center" />
+                            <Setter
+                                Property="VerticalContentAlignment"
+                                Value="Center" />
+                        </Style>
+                    </DataGrid.CellStyle>
+                    <!-- الأعمدة المخصصة -->
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn
+                            Header="Notification">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBox
+                                        Padding="2"
+                                        IsReadOnly="True"
+                                        Background="#00000033"
+                                        Foreground="White"
+                                        SelectionBrush="Red"
+                                        TextAlignment="Center"
+                                        HorizontalAlignment="Center"
+                                        VerticalContentAlignment="Center"
+                                        Text="{Binding  Notification }" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Header="ListName"
+                            Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Padding="2"
+                                        TextWrapping="Wrap"
+                                        Background="#00000033"
+                                        Foreground="White"
+                                        VerticalAlignment="Center"
+                                        TextAlignment="Center"
+                                        Text="{Binding ListName}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Header="VisitDate"
+                            Width="100">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        TextWrapping="Wrap"
+                                        VerticalAlignment="Center"
+                                        TextAlignment="Center"
+                                        Text="{Binding VisitDate}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Header="Technician">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Height="26"
+                                        Width="85"
+                                        VerticalAlignment="Center"
+                                        TextAlignment="Center"
+                                        Text="{Binding Technician}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Header="ServiceDetails">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Height="26"
+                                        Width="85"
+                                        VerticalAlignment="Center"
+                                        TextAlignment="Center"
+                                        Text="{Binding ServiceDetails}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Header="Implemented">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Height="26"
+                                        Width="85"
+                                        VerticalAlignment="Center"
+                                        TextAlignment="Center"
+                                        Text="{Binding Implemented}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTemplateColumn
+                            Header="DeterminationTechnician">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <TextBlock
+                                        Height="26"
+                                        Width="85"
+                                        VerticalAlignment="Center"
+                                        TextAlignment="Center"
+                                        Text="{Binding DeterminationTechnician}" />
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+                <!-- تحميل المزيد -->
+                <!-- أدوات الفلترة -->
+                <StackPanel
+                    Orientation="Horizontal"
+                    Grid.Row="2"
+                    Grid.ColumnSpan="2">
+                    <TextBox
+                        x:Name="FilterTextBox2"
+                        Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}"
+                        Width="200"
+                        Margin="3" />
+                    <Button
+                        Content="Apply Filter"
+                        Command="{Binding  }"
+                        Margin="3" />
+                    <Button
+                        Content="Load Linked Data"
+                        Command="{Binding }"
+                        Margin="3" />
+                    <Button
+                        Content="Load More"
+                        Command="{Binding  }"
+                        HorizontalAlignment="Center"
+                        Margin="3" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="3"
+                    Grid.Column="0"
+                    Margin="3">
+                    <TextBox
+                        Margin="3" />
+                    <Button
+                        Margin="3"
+                        Foreground="Yellow"
+                        Background="Green"
+                        Content="إضافة" />
+                </StackPanel>
+                <StackPanel
+                    Grid.Row="3"
+                    Grid.Column="1"
+                    Margin="3">
+                    <TextBox
+                        Margin="3" />
+                    <Button
+                        Margin="3"
+                        Foreground="Yellow"
+                        Background="DarkRed"
+                        Content="حذف" />
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

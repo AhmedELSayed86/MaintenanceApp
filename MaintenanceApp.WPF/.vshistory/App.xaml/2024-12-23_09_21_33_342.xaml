@@ -1,0 +1,13 @@
+﻿<Application x:Class="MaintenanceApp.WPF.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:MaintenanceApp.WPF"
+             xmlns:locals="clr-namespace:MaintenanceApp.WPF.Converters"
+             StartupUri="MainWindow.xaml">
+    <Application.Resources>
+      
+            <locals:BoolToVisibilityConverter
+                x:Key="BoolToVisibilityConverter" />
+       
+    </Application.Resources>
+</Application>

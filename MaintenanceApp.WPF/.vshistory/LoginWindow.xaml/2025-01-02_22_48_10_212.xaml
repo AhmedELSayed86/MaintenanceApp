@@ -1,0 +1,34 @@
+﻿<UserControl x:Class="MaintenanceApp.WPF.LoginWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:MaintenanceApp.WPF"
+        mc:Ignorable="d"
+         >
+    <Grid>
+        <StackPanel
+            HorizontalAlignment="Center"
+            VerticalAlignment="Center"
+            Width="300">
+            <TextBlock
+                Text="Login"
+                FontSize="20"
+                HorizontalAlignment="Center"
+                Margin="0,0,0,20" />
+            <TextBox
+                x:Name="UsernameTextBox"
+                
+                Margin="0,0,0,10" />
+            <PasswordBox
+                x:Name="PasswordBox"
+                
+                Margin="0,0,0,20" />
+            <Button
+                Content="Login"
+                Command="{Binding LoginCommand}"
+                Width="100"
+                HorizontalAlignment="Center" />
+        </StackPanel>
+    </Grid>
+</UserControl>

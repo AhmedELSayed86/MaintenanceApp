@@ -1,36 +1,72 @@
-﻿using System;
+﻿using MaintenanceApp.WPF.Helper;
+using NLog;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using System.Windows.Input;
 
 namespace MaintenanceApp.WPF.ViewModels;
 
 /// <summary>
-/// هذا هو النموذج الأساسي (BaseViewModel) الذي يدعم:
+/// النموذج الأساسي (BaseViewModel) الذي يدعم:
+/// - تحديث الخصائص (INotifyPropertyChanged).
 /// - التحقق من الأخطاء (INotifyDataErrorInfo).
-/// - تحديث خصائص الواجهة (INotifyPropertyChanged).
+/// - تسجيل الأخطاء باستخدام NLog.
+/// - دعم الأوامر (ICommand).
 /// </summary>
-public abstract class BaseViewModel : INotifyDataErrorInfo, INotifyPropertyChanged
+public abstract class BaseViewModel : INotifyPropertyChanged, INotifyDataErrorInfo
 {
+    // Logger مشترك لجميع الـ ViewModels
+    protected static readonly Logger Logger = LogManager.GetCurrentClassLogger();
+
     // قائمة لتخزين الأخطاء المرتبطة بالخصائص
     private readonly Dictionary<string ,List<string>> _errors = new();
 
-    /// <summary>
-    /// حدث يتم إطلاقه عند تغيير الأخطاء المرتبطة بخصائص معينة.
-    /// </summary>
+    // حدث يتم إطلاقه عند تغيير الأخطاء المرتبطة بخصائص معينة
     public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
-    /// <summary>
-    /// خاصية تحدد ما إذا كان النموذج يحتوي على أخطاء.
-    /// </summary>
+    // خاصية تحدد ما إذا كان النموذج يحتوي على أخطاء
     public bool HasErrors => _errors.Count > 0;
+
+    // خاصية لتحديد إذا كان النموذج مشغولاً (يمكن استخدامها لعرض مؤشر انتظار)
+    private bool _isBusy;
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set => SetProperty(ref _isBusy ,value);
+    }
+
+    // حدث يتم إطلاقه عند تغيير أي خاصية
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    /// <summary>
+    /// إطلاق حدث `PropertyChanged` عند تغيير قيمة خاصية.
+    /// </summary>
+    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this ,new PropertyChangedEventArgs(propertyName));
+    }
+
+    /// <summary>
+    /// تعيين قيمة خاصية مع التحقق من التغيير وإطلاق الحدث إذا لزم الأمر.
+    /// </summary>
+    protected bool SetProperty<T>(ref T backingField ,T value ,Action onChanged = null ,[CallerMemberName] string propertyName = null)
+    {
+        if(EqualityComparer<T>.Default.Equals(backingField ,value))
+            return false;
+
+        backingField = value;
+        OnPropertyChanged(propertyName);
+        onChanged?.Invoke(); // تنفيذ الدالة onChanged إذا كانت غير null
+        return true;
+    }
 
     /// <summary>
     /// الحصول على الأخطاء المرتبطة بخاصية معينة.
     /// </summary>
-    /// <param name="propertyName">اسم الخاصية.</param>
-    /// <returns>قائمة بالأخطاء.</returns>
     public IEnumerable GetErrors(string propertyName)
     {
         return _errors.ContainsKey(propertyName) ? _errors[propertyName] : null;
@@ -68,51 +104,54 @@ public abstract class BaseViewModel : INotifyDataErrorInfo, INotifyPropertyChang
         ErrorsChanged?.Invoke(this ,new DataErrorsChangedEventArgs(propertyName));
     }
 
-    // خاصية لتحديد إذا كان النموذج مشغولاً (يمكن استخدامها لعرض مؤشر انتظار).
-    private bool _isBusy;
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set => SetProperty(ref _isBusy ,value);
-    }
-
     /// <summary>
-    /// حدث يتم إطلاقه عند تغيير أي خاصية.
+    /// التحقق من صحة خاصية معينة بناءً على القواعد المحددة.
     /// </summary>
-    public event PropertyChangedEventHandler PropertyChanged;
-
-    /// <summary>
-    /// إطلاق حدث `PropertyChanged` عند تغيير قيمة خاصية.
-    /// </summary>
-    protected void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    protected void ValidateProperty<T>(string propertyName ,T value)
     {
-        PropertyChanged?.Invoke(this ,new PropertyChangedEventArgs(propertyName));
-    }
-
-    /// <summary>
-    /// تعيين قيمة خاصية مع التحقق من التغيير وإطلاق الحدث إذا لزم الأمر.
-    /// </summary>
-    protected bool SetProperty<T>(ref T backingField ,T value ,[CallerMemberName] string propertyName = null)
-    {
-        if(EqualityComparer<T>.Default.Equals(backingField ,value))
-            return false;
-
-        backingField = value;
-        OnPropertyChanged(propertyName);
-        return true;
-    }
-
-    /// <summary>
-    /// التحقق من صحة خاصية معينة وإضافة أو إزالة الأخطاء بناءً على القواعد.
-    /// </summary>
-    /// <param name="propertyName">اسم الخاصية.</param>
-    /// <param name="validationRule">دالة للتحقق من صحة الخاصية.</param>
-    /// <param name="errorMessage">الرسالة التي تظهر عند وجود خطأ.</param>
-    protected void ValidateProperty(string propertyName ,Func<bool> validationRule ,string errorMessage)
-    {
-        if(validationRule())
-            AddError(propertyName ,errorMessage);
+        // يمكنك إضافة قواعد التحقق هنا
+        if(value is string strValue && string.IsNullOrEmpty(strValue))
+        {
+            AddError(propertyName ,$"{propertyName} مطلوب.");
+        }
         else
+        {
             ClearErrors(propertyName);
+        }
+    }
+
+    /// <summary>
+    /// تسجيل رسالة معلومات (Info) باستخدام NLog.
+    /// </summary>
+    protected void LogInfoAsync(string message)
+    {
+        Logger.Info(message);
+    }
+
+    /// <summary>
+    /// تسجيل رسالة تحذير (Warning) باستخدام NLog.
+    /// </summary>
+    protected void LogWarningAsync(string message)
+    {
+        Logger.Warn(message);
+    }
+
+    /// <summary>
+    /// تسجيل رسالة خطأ (Error) باستخدام NLog.
+    /// </summary>
+    protected void LogErrorAsync(string message ,Exception ex = null)
+    {
+        if(ex == null)
+            Logger.Error(message);
+        else
+            Logger.Error(ex ,message);
+    }
+
+    /// <summary>
+    /// إنشاء أمر (Command) جديد.
+    /// </summary>
+    protected ICommand CreateCommand(Action<object> execute ,Func<object ,bool> canExecute = null)
+    {
+        return new RelayCommand(execute ,canExecute);
     }
 }

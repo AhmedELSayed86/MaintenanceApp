@@ -1,7 +1,6 @@
 ﻿using MaintenanceApp.WPF.Helper;
 using MaintenanceApp.WPF.ViewModels;
 using System.Windows;
-using System.Windows.Controls;
 
 namespace MaintenanceApp.WPF
 {

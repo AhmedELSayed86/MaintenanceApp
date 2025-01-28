@@ -263,6 +263,7 @@ public class AddVisitDataViewModel : BaseViewModel
         LoadEmployeeData();
 
         VisitDate = DateTime.Today; // تعيين تاريخ اليوم كقيمة افتراضية
+       LogInfoAsync("تم تهيئة AddVisitDataViewModel بنجاح.");
     }
 
     private void ResetErrorColor()

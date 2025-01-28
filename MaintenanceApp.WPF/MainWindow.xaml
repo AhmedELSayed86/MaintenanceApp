@@ -57,12 +57,13 @@
                         Background="DeepSkyBlue" />
                     <Button
                         Content="التوزيع"
-                        Command="{Binding OpeneDistributionToTechniciansCommand}"
+                        Command="{Binding OpenDistributionToTechniciansCommand}"
                         Margin="5"
                         Foreground="AliceBlue"
-                        Background="Green" />  <Button
+                        Background="Green" />
+                    <Button
                         Content="التتميم"
-                        Command="{Binding OpeneImplementedCommand}"
+                        Command="{Binding OpenImplementedCommand}"
                         Margin="5"
                         Foreground="AliceBlue"
                         Background="Green" />
@@ -80,19 +81,19 @@
                         Background="Green" />
                     <Button
                         Content="الفنيين"
-                        Command="{Binding  OpeneEmployeeCommand}"
+                        Command="{Binding  OpenEmployeeCommand}"
                         Margin="5"
                         Foreground="AliceBlue"
                         Background="Green" />
                     <Button
                         Content="Excel Importer"
-                        Command="{Binding  OpeneExcel_ImporterCommand}"
+                        Command="{Binding  OpenExcelImporterCommand}"
                         Margin="5"
                         Foreground="AliceBlue"
                         Background="Green" />
                     <Button
                         Content="إضافة بلاغات"
-                        Command="{Binding  OpeneImportExcelNotificationsCommand }"
+                        Command="{Binding  OpenImportExcelNotificationsCommand }"
                         Margin="5"
                         Foreground="AliceBlue"
                         Background="Green" />
@@ -102,6 +103,70 @@
                         Margin="5"
                         Foreground="AliceBlue"
                         Background="Green" />
+                    <Button
+                        Content="حول التطبيق"
+                        Command="{Binding OpenAboutCommand }"
+                        Margin="5"
+                        >
+                        <Button.Style>
+                            <Style
+                                TargetType="{x:Type Button}">
+                                <Setter
+                                    Property="Background"
+                                    Value="Transparent" />
+                                <Setter
+                                    Property="Foreground"
+                                    Value="Gray" />
+                                <Setter
+                                    Property="IsTabStop"
+                                    Value="False" />
+                                <Setter
+                                    Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate
+                                            TargetType="{x:Type Button}">
+                                            <Border
+                                                BorderThickness="1"
+                                                BorderBrush="Gray"
+                                                Background="{TemplateBinding Background}"
+                                                Height="25">
+                                                <Grid>
+                                                    <ContentPresenter
+                                                        x:Name="MyContentPresenter"
+                                                        Content="{TemplateBinding Content}"
+                                                        HorizontalAlignment="Center"
+                                                        VerticalAlignment="Center"
+                                                        Margin="5,0,5,0" />
+                                                </Grid>
+                                            </Border>
+                                            <ControlTemplate.Triggers>
+                                                <Trigger
+                                                    Property="IsMouseOver"
+                                                    Value="True">
+                                                    <Setter
+                                                        Property="Foreground"
+                                                        Value="White" />
+                                                    <Setter
+                                                        Property="Background"
+                                                        Value="Red" />
+                                                </Trigger>
+                                                <Trigger
+                                                    Property="IsPressed"
+                                                    Value="True">
+                                                    <Setter
+                                                        Property="Background"
+                                                        Value="IndianRed" />
+                                                    <Setter
+                                                        Property="Foreground"
+                                                        Value="Black" />
+                                                </Trigger>
+                                            </ControlTemplate.Triggers>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </Style>
+                        </Button.Style>
+                    </Button>
                     <Button
                         Content="Log In"
                         Command="{Binding LogInCommand}"
@@ -129,7 +194,7 @@
                     Text="{Binding CurrentUserName}"
                     Foreground="LightGreen"
                     FontSize="15"
-                    FontWeight="Normal" 
+                    FontWeight="Normal"
                     TextWrapping="Wrap"
                     HorizontalAlignment="Right"
                     VerticalAlignment="Center"

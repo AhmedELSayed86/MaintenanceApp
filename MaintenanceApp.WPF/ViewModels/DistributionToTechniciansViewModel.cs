@@ -16,252 +16,177 @@ namespace MaintenanceApp.WPF.ViewModels;
 public class DistributionToTechniciansViewModel : BaseViewModel
 {
     private readonly IDatabaseHelper _databaseHelper;
+    private readonly EmployeeDataViewModel _employeeDataViewModel;
+
+    // قوائم البيانات
     public ObservableCollection<SAPDataWithStatus> SAPDataRecords { get; set; } = new();
     public ObservableCollection<VisitData> VisitDataRecords { get; set; } = new();
     public ObservableCollection<LinkedVisitDatasToSAPDatas> LinkedVisitDatasToSAPDatasRecords { get; set; } = new();
     public ObservableCollection<SAPDataWithStatus> FilteredSAPDataRecords { get; set; } = new();
-    private readonly EmployeeDataViewModel _employeeDataViewModel;
-
     public ObservableCollection<EmployeeData> EmployeeRecords { get; set; } = new();
     public ObservableCollection<EmployeeData> FilteredEmployeeRecords { get; set; } = new();
 
-
+    // الخصائص
     private EmployeeData _selectedEmployee;
     public EmployeeData SelectedEmployee
     {
         get => _selectedEmployee;
-        set
+        set => SetProperty(ref _selectedEmployee ,value ,onChanged: () =>
         {
-            if(_selectedEmployee != value) // تحقق من تغيير القيمة
-            {
-                _selectedEmployee = value;
-                EmployeeName = _selectedEmployee?.Name ?? string.Empty;
-                OnPropertyChanged(nameof(SelectedEmployee));
-            }
-        }
+            EmployeeName = _selectedEmployee?.Name ?? string.Empty;
+            ApplyEmployeeFilter();
+        });
     }
 
     private string _employeeName;
     public string EmployeeName
     {
         get => _employeeName;
-        set
-        {
-            _employeeName = value;
-            ApplyEmployeeFilter();
-            OnPropertyChanged(nameof(EmployeeName));
-        }
+        set => SetProperty(ref _employeeName ,value ,onChanged: ApplyEmployeeFilter);
     }
 
     private int? _employeeCode;
     public int? EmployeeCode
     {
         get => _employeeCode;
-        set
-        {
-            _employeeCode = value;
-            ApplyEmployeeFilter();
-            OnPropertyChanged(nameof(EmployeeCode));
-        }
+        set => SetProperty(ref _employeeCode ,value ,onChanged: ApplyEmployeeFilter);
     }
 
     private IList _selectedSAPDataRecords;
     public IList SelectedSAPDataRecords
     {
         get => _selectedSAPDataRecords;
-        set
-        {
-            _selectedSAPDataRecords = value;
-            OnPropertyChanged(nameof(SelectedSAPDataRecords));
-        }
+        set => SetProperty(ref _selectedSAPDataRecords ,value);
     }
 
     private SAPData _selectedSAPData;
     public SAPData SelectedSAPData
     {
         get => _selectedSAPData;
-        set
-        {
-            _selectedSAPData = value;
-            LoadVisitData();
-            OnPropertyChanged(nameof(SelectedSAPData));
-        }
+        set => SetProperty(ref _selectedSAPData ,value ,onChanged: LoadVisitData);
     }
 
     private VisitData _selectedVisitData;
     public VisitData SelectedVisitData
     {
         get => _selectedVisitData;
-        set
-        {
-            _selectedVisitData = value;
-            OnPropertyChanged(nameof(SelectedVisitData)); // إعلام واجهة المستخدم بالتغيير
-        }
+        set => SetProperty(ref _selectedVisitData ,value);
     }
 
     private string _newNotification;
     public string NewNotification
     {
         get => _newNotification;
-        set
-        {
-            _newNotification = value;
-            OnPropertyChanged(nameof(NewNotification));
-        }
+        set => SetProperty(ref _newNotification ,value);
     }
 
-    private DateTime _visitDate;
+    private DateTime _visitDate = DateTime.Today;
     public DateTime VisitDate
     {
         get => _visitDate;
-        set
-        {
-            _visitDate = value;
-            OnPropertyChanged(nameof(VisitDate));
-        }
+        set => SetProperty(ref _visitDate ,value);
     }
 
     private string _searchKeyword;
     public string SearchKeyword
     {
         get => _searchKeyword;
-        set
+        set => SetProperty(ref _searchKeyword ,value ,onChanged: () =>
         {
-            if(_searchKeyword != value)
+            ApplyEmployeeFilter();
+            ApplyFilter(); // تطبيق التصفية على SAPDataRecords
+            var employee = EmployeeRecords.FirstOrDefault(e => e.Code.ToString() == _searchKeyword);
+            if(employee != null)
             {
-                _searchKeyword = value;
-                ApplyEmployeeFilter(); // تطبيق التصفية عند تغيير الكلمة المفتاحية
-
-                // البحث عن الموظف بناءً على الكود المكتوب
-                var employee = EmployeeRecords.FirstOrDefault(e => e.Code.ToString() == _searchKeyword);
-                if(employee != null)
-                {
-                    SelectedEmployee = employee; // تحديث الموظف المحدد
-                    EmployeeName = employee.Name; // تحديث اسم الموظف
-                }
-
-                OnPropertyChanged(nameof(SearchKeyword));
+                SelectedEmployee = employee;
+                EmployeeName = employee.Name;
             }
-        }
+        });
     }
 
     private string _technicianCode;
     public string TechnicianCode
     {
         get => _technicianCode;
-        set
-        {
-            _technicianCode = value;
-            OnPropertyChanged(nameof(TechnicianCode));
-        }
+        set => SetProperty(ref _technicianCode ,value);
     }
 
     private int _loggedInUser;
     public int LoggedInUser
     {
         get => _loggedInUser;
-        set
-        {
-            _loggedInUser = value;
-            OnPropertyChanged(nameof(LoggedInUser));
-        }
+        set => SetProperty(ref _loggedInUser ,value);
     }
 
     private string _summary;
     public string Summary
     {
         get => _summary;
-        set
+        set => SetProperty(ref _summary ,value ,onChanged: () =>
         {
-            _summary = value;
-            OnPropertyChanged(nameof(Summary));
-            _= MessageController.SummaryAsync(Summary);
-            CommandManager.InvalidateRequerySuggested(); // تحديث الأوامر
-        }
+            _ = MessageController.SummaryAsync(Summary).ConfigureAwait(false);
+            CommandManager.InvalidateRequerySuggested();
+        });
     }
 
-    private bool _isLoading = false;
+    private bool _isLoading;
     public bool IsLoading
     {
         get => _isLoading;
-        set
-        {
-            _isLoading = value;
-            OnPropertyChanged(nameof(IsLoading));
-            CommandManager.InvalidateRequerySuggested(); // تحديث الأوامر
-        }
+        set => SetProperty(ref _isLoading ,value ,onChanged: () => CommandManager.InvalidateRequerySuggested());
     }
 
     private Brush _technicianTextBoxBackground = Brushes.Black;
     public Brush TechnicianTextBoxBackground
     {
         get => _technicianTextBoxBackground;
-        set
-        {
-            _technicianTextBoxBackground = value;
-            OnPropertyChanged(nameof(TechnicianTextBoxBackground));
-        }
+        set => SetProperty(ref _technicianTextBoxBackground ,value);
     }
 
     private Brush _sAPDataBackground = Brushes.LawnGreen;
     public Brush SAPDataBackground
     {
         get => _sAPDataBackground;
-        set
-        {
-            _sAPDataBackground = value;
-            OnPropertyChanged(nameof(SAPDataBackground));
-        }
+        set => SetProperty(ref _sAPDataBackground ,value);
     }
 
     private Brush _visitDateBackground = Brushes.Black;
     public Brush VisitDateBackground
     {
         get => _visitDateBackground;
-        set
-        {
-            _visitDateBackground = value;
-            OnPropertyChanged(nameof(VisitDateBackground));
-        }
+        set => SetProperty(ref _visitDateBackground ,value);
     }
 
     private DateTime _myTime = DateTime.Today.AddDays(-6);
     public DateTime MyTime
     {
         get => _myTime;
-        set
-        {
-            _myTime = value;
-            OnPropertyChanged(nameof(VisitDateBackground));
-        }
+        set => SetProperty(ref _myTime ,value);
     }
 
+    // الأوامر
     public ICommand LoadDataCommand { get; }
     public ICommand AddVisitDataCommand { get; }
     public ICommand DeleteVisitDataCommand { get; }
     public ICommand UpdateVisitDataCommand { get; }
     public ICommand DistributeCommand { get; }
-
+     
     public DistributionToTechniciansViewModel(IDatabaseHelper databaseHelper)
     {
         _databaseHelper = databaseHelper ?? throw new ArgumentNullException(nameof(databaseHelper));
         _employeeDataViewModel = new EmployeeDataViewModel(databaseHelper) ?? throw new ArgumentNullException(nameof(EmployeeDataViewModel));
 
-        LoadDataCommand = new RelayCommand(async _ => await LoadDataAsync());
-        // الأمر الجديد لتحديث StatusID
-
-        AddVisitDataCommand = new RelayCommand(async _ => await AddVisitDataAsync());
-        DeleteVisitDataCommand = new RelayCommand(async _ => await DeleteVisitDataAsync());
-        UpdateVisitDataCommand = new RelayCommand(async _ => await UpdateVisitDataAsync());
-
-        // الأمر الجديد للتوزيع
-        DistributeCommand = new RelayCommand(async _ => await DistributionToTechniciansAsync());
+        // تهيئة الأوامر
+        LoadDataCommand = CreateCommand(async _ => await LoadDataAsync());
+        AddVisitDataCommand = CreateCommand(async _ => await AddVisitDataAsync());
+        DeleteVisitDataCommand = CreateCommand(async _ => await DeleteVisitDataAsync());
+        UpdateVisitDataCommand = CreateCommand(async _ => await UpdateVisitDataAsync());
+        DistributeCommand = CreateCommand(async _ => await DistributionToTechniciansAsync());
 
         // تحميل البيانات عند بدء التطبيق
         _ = LoadDataAsync();
         LoadEmployeeData();
-
-        VisitDate = DateTime.Today; // تعيين تاريخ اليوم كقيمة افتراضية
+         LogInfoAsync("تم تهيئة DistributionToTechniciansViewModel بنجاح.");
     }
 
     private void ResetErrorColor()
@@ -273,33 +198,31 @@ public class DistributionToTechniciansViewModel : BaseViewModel
 
     private async Task DistributionToTechniciansAsync()
     {
-        bool chek = true;
         ResetErrorColor();
+        bool isValid = true;
+
         if(SelectedEmployee == null)
         {
             TechnicianTextBoxBackground = Brushes.IndianRed;
-            await MessageController.SummaryAsync("يجب إدخال كود الفني.");
-            chek = false;
+            await MessageController.SummaryAsync("يجب إدخال كود الفني.").ConfigureAwait(false);
+            isValid = false;
         }
 
-        if(VisitDate == null || VisitDate.ToString() == "0001-01-01 12:00:00 AM")
+        if(VisitDate == default)
         {
             VisitDateBackground = Brushes.IndianRed;
-            await MessageController.SummaryAsync("يجب تحديد تاريخ الزيارة");
-            chek = false;
+            await MessageController.SummaryAsync("يجب تحديد تاريخ الزيارة").ConfigureAwait(false);
+            isValid = false;
         }
 
         if(SelectedSAPDataRecords == null || SelectedSAPDataRecords.Count == 0)
         {
             SAPDataBackground = Brushes.IndianRed;
-            await MessageController.SummaryAsync("يجب تحديد بلاغ.");
-            chek = false;
+            await MessageController.SummaryAsync("يجب تحديد بلاغ.").ConfigureAwait(false);
+            isValid = false;
         }
 
-        if(chek == false)
-        {
-            return;
-        }
+        if(!isValid) return;
 
         try
         {
@@ -309,7 +232,6 @@ public class DistributionToTechniciansViewModel : BaseViewModel
                 {
                     if(selectedItem is SAPDataWithStatus sapData)
                     {
-                        // إضافة سجل جديد في جدول VisitData
                         var newVisit = new VisitData
                         {
                             Notification = sapData.Notification ,
@@ -323,15 +245,10 @@ public class DistributionToTechniciansViewModel : BaseViewModel
 
                         await connection.InsertAsync(newVisit ,transaction);
 
-                        // جلب السجل الحالي من جدول SAPData
                         var existingSAPData = await connection.GetAsync<SAPData>(sapData.Notification ,transaction);
-
                         if(existingSAPData != null)
                         {
-                            // تحديث StatusID فقط
                             existingSAPData.StatusID = 1;
-
-                            // حفظ التغييرات في قاعدة البيانات
                             await connection.UpdateAsync(existingSAPData ,transaction);
                         }
                         else
@@ -341,13 +258,16 @@ public class DistributionToTechniciansViewModel : BaseViewModel
                     }
                 }
             });
-            _ = LoadDataAsync();
+
+            await LoadDataAsync();
             LoadVisitData();
-            await MessageController.SummaryAsync("تم التوزيع بنجاح.");
+             LogInfoAsync("تم التوزيع بنجاح.");
+            await MessageController.SummaryAsync("تم التوزيع بنجاح.").ConfigureAwait(false);
         }
         catch(Exception ex)
         {
-            await MessageController.SummaryAsync($"حدث خطأ أثناء التوزيع: {ex.Message}");
+             LogErrorAsync("حدث خطأ أثناء التوزيع" ,ex);
+            await MessageController.SummaryAsync($"حدث خطأ أثناء التوزيع: {ex.Message}").ConfigureAwait(false);
         }
     }
 
@@ -355,9 +275,7 @@ public class DistributionToTechniciansViewModel : BaseViewModel
     {
         try
         {
-            // تحميل البيانات من قاعدة البيانات
             var employeeList = await _databaseHelper.GetAllRecordsAsync<EmployeeData>();
-
             if(employeeList != null && employeeList.Any())
             {
                 EmployeeRecords = new ObservableCollection<EmployeeData>(employeeList);
@@ -366,12 +284,13 @@ public class DistributionToTechniciansViewModel : BaseViewModel
             }
             else
             {
-                await MessageController.SummaryAsync("لا توجد بيانات موظفين لعرضها.");
+                await MessageController.SummaryAsync("لا توجد بيانات موظفين لعرضها.").ConfigureAwait(false);
             }
         }
         catch(Exception ex)
         {
-            await MessageController.SummaryAsync($"خطأ في تحميل بيانات الموظفين: {ex.Message}");
+             LogErrorAsync("خطأ في تحميل بيانات الموظفين" ,ex);
+            await MessageController.SummaryAsync($"خطأ في تحميل بيانات الموظفين: {ex.Message}").ConfigureAwait(false);
         }
     }
 
@@ -379,12 +298,7 @@ public class DistributionToTechniciansViewModel : BaseViewModel
     {
         if(string.IsNullOrWhiteSpace(SearchKeyword))
         {
-            // إذا كانت قائمة التصفية مطابقة للبيانات الأصلية، لا تقم بتغييرها
-            if(!FilteredEmployeeRecords.SequenceEqual(EmployeeRecords))
-            {
-                FilteredEmployeeRecords = new ObservableCollection<EmployeeData>(EmployeeRecords);
-                OnPropertyChanged(nameof(FilteredEmployeeRecords));
-            }
+            FilteredEmployeeRecords = new ObservableCollection<EmployeeData>(EmployeeRecords);
         }
         else
         {
@@ -392,12 +306,23 @@ public class DistributionToTechniciansViewModel : BaseViewModel
                 (!string.IsNullOrEmpty(e.Name) && e.Name.Contains(SearchKeyword)) ||
                 (!string.IsNullOrEmpty(e.Code.ToString()) && e.Code.ToString().Contains(SearchKeyword))).ToList();
 
-            // إذا كانت قائمة التصفية مطابقة للبيانات الجديدة، لا تقم بتغييرها
-            if(!FilteredEmployeeRecords.SequenceEqual(filtered))
-            {
-                FilteredEmployeeRecords = new ObservableCollection<EmployeeData>(filtered);
-                OnPropertyChanged(nameof(FilteredEmployeeRecords));
-            }
+            FilteredEmployeeRecords = new ObservableCollection<EmployeeData>(filtered);
+        }
+        OnPropertyChanged(nameof(FilteredEmployeeRecords));
+    }
+
+    private void ApplyFilter()
+    {
+        if(string.IsNullOrWhiteSpace(SearchKeyword))
+        {
+            FilteredSAPDataRecords = new ObservableCollection<SAPDataWithStatus>(SAPDataRecords);
+            _ = MessageController.SummaryAsync($"ApplyFilterif FilteredSAPDataRecords.Count: {FilteredSAPDataRecords.Count}").ConfigureAwait(false);
+        }
+        else
+        {
+            FilteredSAPDataRecords = new ObservableCollection<SAPDataWithStatus>(
+                SAPDataRecords.Where(s => s.Notification.ToString()?.Contains(SearchKeyword) == true));
+            _ = MessageController.SummaryAsync($"ApplyFilterelse FilteredSAPDataRecords.Count: {FilteredSAPDataRecords.Count}").ConfigureAwait(false);
         }
     }
 
@@ -416,22 +341,8 @@ public class DistributionToTechniciansViewModel : BaseViewModel
         }
         catch(Exception ex)
         {
-            await MessageController.SummaryAsync($"Error loading data: {ex.Message}");
-        }
-    }
-
-    private void ApplyFilter()
-    {
-        if(string.IsNullOrWhiteSpace(SearchKeyword))
-        {
-            FilteredSAPDataRecords = new ObservableCollection<SAPDataWithStatus>(SAPDataRecords);
-            _= MessageController.SummaryAsync($"ApplyFilterif FilteredSAPDataRecords.Count: {FilteredSAPDataRecords.Count}");
-        }
-        else
-        {
-            FilteredSAPDataRecords = new ObservableCollection<SAPDataWithStatus>(
-                SAPDataRecords.Where(s => s.Notification.ToString()?.Contains(SearchKeyword) == true));
-            _= MessageController.SummaryAsync($"ApplyFilterelse FilteredSAPDataRecords.Count: {FilteredSAPDataRecords.Count}");
+             LogErrorAsync("Error loading data" ,ex);
+            await MessageController.SummaryAsync($"Error loading data: {ex.Message}").ConfigureAwait(false);
         }
     }
 
@@ -439,18 +350,35 @@ public class DistributionToTechniciansViewModel : BaseViewModel
     {
         try
         {
+            // التحقق من SelectedSAPData
+            if(SelectedSAPData?.Notification == null)
+            {
+                await MessageController.SummaryAsync("No SAP data selected or notification is missing.").ConfigureAwait(false);
+                return;
+            }
+
             VisitDataRecords.Clear();
 
-            var linkedVisitData = await _databaseHelper.GetFilteredLinkedRecordsAsync(
-                "VisitDatas" ,    // الجدول الأول
-                "SAPDatas" ,      // الجدول الثاني
-                "EmployeeDatas" , // الجدول الثالث
-                "Notification" ,  // عمود الربط بين VisitDatas و SAPDatas
-                SelectedSAPData.Notification.ToString() // قيمة الإشعار المحدد
-            );
+            // جلب البيانات
+            var linkedVisitData = await _databaseHelper.GetFilteredLinkedDateRecordsAsync(
+                nameof(VisitData) ,
+                nameof(SAPData) ,
+                nameof(EmployeeData) ,
+                nameof(VisitData.Notification) ,
+                SelectedSAPData.Notification.ToString() ,
+                DateTime.Today);
 
-            if(linkedVisitData == null || linkedVisitData.Count() == 0) return;
+            // التحقق من linkedVisitData
+            if(linkedVisitData == null || !linkedVisitData.Any())
+            {
+                await MessageController.SummaryAsync("No linked visit data found.").ConfigureAwait(false);
+                return;
+            }
 
+            // التحقق من LinkedVisitDatasToSAPDatasRecords
+            LinkedVisitDatasToSAPDatasRecords ??= new ObservableCollection<LinkedVisitDatasToSAPDatas>();
+
+            // إضافة البيانات إلى القائمة
             foreach(var data in linkedVisitData)
             {
                 LinkedVisitDatasToSAPDatasRecords.Add(new LinkedVisitDatasToSAPDatas
@@ -458,7 +386,7 @@ public class DistributionToTechniciansViewModel : BaseViewModel
                     ID = data.ID ,
                     Notification = data.Notification ,
                     VisitDate = data.VisitDate ,
-                    Technician = data.Technician , // اسم الفني
+                    Technician = data.Technician ,
                     ServiceDetails = data.ServiceDetails ,
                     ListName = data.ListName ,
                     Implemented = data.Implemented ,
@@ -466,17 +394,18 @@ public class DistributionToTechniciansViewModel : BaseViewModel
                 });
             }
 
-            OnPropertyChanged(nameof(VisitDataRecords));
+            OnPropertyChanged(nameof(LinkedVisitDatasToSAPDatasRecords));
         }
         catch(Exception ex)
         {
-            await MessageController.SummaryAsync($"Error loading data: {ex.Message}");
+             LogErrorAsync($"Error loading visit data: {ex.Message}" ,ex);
+            await MessageController.SummaryAsync($"Error loading data: {ex.Message}").ConfigureAwait(false);
         }
     }
 
     private async Task AddVisitDataAsync()
     {
-        if(SelectedSAPData == null) return; else await MessageController.SummaryAsync("Not Select");
+        if(SelectedSAPData == null) return;
 
         try
         {
@@ -509,7 +438,8 @@ public class DistributionToTechniciansViewModel : BaseViewModel
         }
         catch(Exception ex)
         {
-            await MessageController.SummaryAsync($"Error adding visit data: {ex.Message}");
+             LogErrorAsync("Error adding visit data" ,ex);
+            await MessageController.SummaryAsync($"Error adding visit data: {ex.Message}").ConfigureAwait(false);
         }
     }
 
@@ -525,7 +455,8 @@ public class DistributionToTechniciansViewModel : BaseViewModel
         }
         catch(Exception ex)
         {
-            await MessageController.SummaryAsync($"Error deleting visit data: {ex.Message}");
+             LogErrorAsync("Error deleting visit data" ,ex);
+            await MessageController.SummaryAsync($"Error deleting visit data: {ex.Message}").ConfigureAwait(false);
         }
     }
 
@@ -541,7 +472,8 @@ public class DistributionToTechniciansViewModel : BaseViewModel
         }
         catch(Exception ex)
         {
-            await MessageController.SummaryAsync($"Error updating visit data: {ex.Message}");
+             LogErrorAsync("Error updating visit data" ,ex);
+            await MessageController.SummaryAsync($"Error updating visit data: {ex.Message}").ConfigureAwait(false);
         }
     }
 

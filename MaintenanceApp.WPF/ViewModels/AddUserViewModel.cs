@@ -31,6 +31,7 @@ public class AddUserViewModel : BaseViewModel
     private AddUserViewModel(IDatabaseHelper databaseHelper)
     {
         _databaseHelper = databaseHelper ?? throw new ArgumentNullException(nameof(databaseHelper));
+         LogInfoAsync("تم تهيئة AddUserViewModel بنجاح.");
     }
 
     public async Task<bool> AddUserAsync()

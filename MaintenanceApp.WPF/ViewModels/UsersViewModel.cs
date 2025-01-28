@@ -75,6 +75,7 @@ namespace MaintenanceApp.WPF.ViewModels
             DeleteUserCommand = new RelayCommand(async _ => await DeleteUserAsync());
 
             _ = LoadUsersAsync();
+               LogInfoAsync("تم تهيئة UsersViewModel بنجاح.");
         }
 
         private async Task LoadUsersAsync()

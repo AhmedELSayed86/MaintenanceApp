@@ -1,9 +1,10 @@
-﻿using MaintenanceApp.WPF.Controllers;
-using MaintenanceApp.WPF.Helper;
+﻿using MaintenanceApp.WPF.Helper;
 using MaintenanceApp.WPF.Views;
+using NLog;
 using System;
 using System.Linq;
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 
@@ -11,74 +12,67 @@ namespace MaintenanceApp.WPF.ViewModels;
 
 public class MainViewModel : BaseViewModel
 {
-    private static MainWindow mainWindow;
-    public string CurrentUserName => CurrentUser.Instance.Username;
+    private static MainWindow _mainWindow;
+    private Brush _exitBackground = Brushes.LightGray;
 
-    private Brush _exitBackground;
+    // الخصائص
+    public string CurrentUserName => CurrentUser.Instance.Username;
     public Brush EXITBackground
     {
         get => _exitBackground;
-        set
-        {
-            _exitBackground = value;
-            OnPropertyChanged(nameof(EXITBackground));
-            // RowSelectedCommand?.Execute(null); // استدعاء الأمر يدويًا عند التغيير
-        }
+        set => SetProperty(ref _exitBackground ,value);
     }
 
     private string _summary = "بسم الله";
     public string Summary
     {
         get => _summary;
-        set
-        {
-            _summary = value;
-            OnPropertyChanged(nameof(Summary));
-            CommandManager.InvalidateRequerySuggested(); // تحديث الأوامر
-        }
+        set => SetProperty(ref _summary ,value ,onChanged: () => CommandManager.InvalidateRequerySuggested());
     }
 
-    // Commands
+    // الأوامر
     public ICommand LogInCommand { get; }
     public ICommand LogOutCommand { get; }
-    public ICommand EXITBackgroundCommand { get; }
     public ICommand OpenHomeCommand { get; }
-    public ICommand LoadCommand { get; }
-    public ICommand PrintCommand { get; }
-    public ICommand OpeneEmployeeCommand { get; }
+    public ICommand OpenAboutCommand { get; }
     public ICommand OpenPrintCommand { get; }
-    public ICommand OpeneImplementedCommand { get; }
-    public ICommand OpeneDistributionToTechniciansCommand { get; }
-    public ICommand OpeneImportExcelNotificationsCommand { get; }
-    public ICommand OpeneExcel_ImporterCommand { get; }
+    public ICommand OpenEmployeeCommand { get; }
+    public ICommand OpenImplementedCommand { get; }
+    public ICommand OpenDistributionToTechniciansCommand { get; }
+    public ICommand OpenImportExcelNotificationsCommand { get; }
+    public ICommand OpenExcelImporterCommand { get; }
     public ICommand ApplicationShutdownCommand { get; }
 
     public MainViewModel()
     {
-        _exitBackground = Brushes.LightGray;
-        OpenHomeCommand = new RelayCommand(o => OpenHomeWindow());
-        OpeneEmployeeCommand = new RelayCommand(o => OpeneEmployeeWindow());
-        OpenPrintCommand = new RelayCommand(o => OpenPrintWindow());
-        OpeneImportExcelNotificationsCommand = new RelayCommand(o => OpeneImportExcelNotificationsWindow());
-        OpeneExcel_ImporterCommand = new RelayCommand(o => OpeneExcel_ImporterWindow());
-        ApplicationShutdownCommand = new RelayCommand(o => ShutdownApplication());
-        OpeneImplementedCommand = new RelayCommand(o => OpeneImplementedWindow());
-        OpeneDistributionToTechniciansCommand = new RelayCommand(o => OpeneDistributionToTechniciansWindow());
-        // EXITBackgroundCommand = new RelayCommand(o => EXITBackgroundButton());
+        // تهيئة الأوامر
+        OpenAboutCommand = CreateCommand(_ => OpenAboutWindow());
+        OpenHomeCommand = CreateCommand(_ => OpenHomeWindow());
+        OpenEmployeeCommand = CreateCommand(_ => OpenEmployeeWindow());
+        OpenPrintCommand = CreateCommand(_ => OpenPrintWindow());
+        OpenImportExcelNotificationsCommand = CreateCommand(_ => OpenImportExcelNotificationsWindow());
+        OpenExcelImporterCommand = CreateCommand(_ => OpenExcelImporterWindow());
+        ApplicationShutdownCommand = CreateCommand(_ => ShutdownApplication());
+        OpenImplementedCommand = CreateCommand(_ => OpenImplementedWindow());
+        OpenDistributionToTechniciansCommand = CreateCommand(_ => OpenDistributionToTechniciansWindow());
 
-        // أوامر تسجيل الدخول وتسجيل الخروج
         LogInCommand = new RelayCommand(ExecuteLogIn ,CanExecuteLogIn);
-        LogOutCommand = new RelayCommand(ExecuteLogOut ,CanExecuteLogOut); GetBasePage();
-          
+        LogOutCommand = new RelayCommand(ExecuteLogOut ,CanExecuteLogOut);
+
+        GetBasePage();
+
+        // تحديث اسم المستخدم عند تغييره
         CurrentUser.Instance.PropertyChanged += (s ,e) =>
         {
             if(e.PropertyName == nameof(CurrentUser.Username))
             {
                 OnPropertyChanged(nameof(CurrentUserName));
             }
-        }; 
+        };
+        LogInfoAsync("تم تهيئة MainViewModel بنجاح.");    
     }
-     
+
+    // منطق تسجيل الدخول
     private bool CanExecuteLogIn(object parameter)
     {
         // يمكن تنفيذ تسجيل الدخول إذا لم يكن هناك مستخدم حالي
@@ -87,25 +81,24 @@ public class MainViewModel : BaseViewModel
 
     private void ExecuteLogIn(object parameter)
     {
-        // نافذة تسجيل الدخول
         var loginWindow = new LoginWindow();
         loginWindow.ShowDialog();
     }
 
+    // منطق تسجيل الخروج
     private bool CanExecuteLogOut(object parameter)
     {
-        // يمكن تنفيذ تسجيل الخروج إذا كان هناك مستخدم حالي
-
         return !string.IsNullOrEmpty(CurrentUser.Instance.Username);
     }
 
     private void ExecuteLogOut(object parameter)
     {
-        CurrentUser.Instance.ClearUser(); // إزالة بيانات المستخدم الحالي
-        OnPropertyChanged(nameof(CurrentUserName)); // تحديث اسم المستخدم
-       Summary ="Logged out successfully!" ;
+        CurrentUser.Instance.ClearUser();
+        OnPropertyChanged(nameof(CurrentUserName));
+        Summary = "تم تسجيل الخروج بنجاح!";
     }
 
+    // إغلاق التطبيق
     private void ShutdownApplication()
     {
         var result = MessageBox.Show("هل تريد الخروج من البرنامج؟" ,"تنبيه" ,
@@ -117,52 +110,60 @@ public class MainViewModel : BaseViewModel
         }
     }
 
+    // فتح النوافذ
     private void OpenHomeWindow()
     {
-        HomeWindow homeWindow = System.Windows.Application.Current.Windows.OfType<HomeWindow>().FirstOrDefault() ?? new HomeWindow();
-        mainWindow.MainContentControl.Content = homeWindow;
+        OpenWindow<HomeWindow>();
+    }
+
+    private void OpenAboutWindow()
+    {
+        OpenWindow<AboutView>();
     }
 
     private void OpenPrintWindow()
     {
-        PrintWindow printWindow = System.Windows.Application.Current.Windows.OfType<PrintWindow>().FirstOrDefault() ?? new PrintWindow();
-        mainWindow.MainContentControl.Content = printWindow;
+        OpenWindow<PrintWindow>();
     }
 
-    private void OpeneDistributionToTechniciansWindow()
+    private void OpenDistributionToTechniciansWindow()
     {
-        DistributionToTechniciansWindow Window = System.Windows.Application.Current.Windows.OfType<DistributionToTechniciansWindow>().FirstOrDefault() ?? new DistributionToTechniciansWindow();
-        mainWindow.MainContentControl.Content = Window;
-    } 
-    
-    private void OpeneImplementedWindow()
-    {
-        AddVisitDataWindow  Window = System.Windows.Application.Current.Windows.OfType<AddVisitDataWindow>().FirstOrDefault() ?? new AddVisitDataWindow();
-        mainWindow.MainContentControl.Content =  Window;
+        OpenWindow<DistributionToTechniciansWindow>();
     }
 
-    private void OpeneImportExcelNotificationsWindow()
+    private void OpenImplementedWindow()
     {
-        ImportSAPDataExcelWindow  Window = System.Windows.Application.Current.Windows.OfType<ImportSAPDataExcelWindow>().FirstOrDefault() ?? new ImportSAPDataExcelWindow();
-
-        mainWindow.MainContentControl.Content =  Window;
+        OpenWindow<AddVisitDataWindow>();
     }
 
-    private void OpeneExcel_ImporterWindow()
+    private void OpenImportExcelNotificationsWindow()
     {
-        Excel_ImporterWindow excelWindow = System.Windows.Application.Current.Windows.OfType<Excel_ImporterWindow>().FirstOrDefault() ?? new Excel_ImporterWindow();
-
-        mainWindow.MainContentControl.Content = excelWindow;
+        OpenWindow<ImportSAPDataExcelWindow>();
     }
 
-    private void OpeneEmployeeWindow()
+    private void OpenExcelImporterWindow()
     {
-        EmployeeWindow employeeWindow = System.Windows.Application.Current.Windows.OfType<EmployeeWindow>().FirstOrDefault() ?? new EmployeeWindow();
-        mainWindow.MainContentControl.Content = employeeWindow;
+        OpenWindow<Excel_ImporterWindow>();
     }
 
+    private void OpenEmployeeWindow()
+    {
+        OpenWindow<EmployeeWindow>();
+    }
+
+    // دالة مساعدة لفتح النوافذ
+    private void OpenWindow<T>() where T : UserControl, new()
+    {
+        var window = Application.Current.Windows.OfType<T>().FirstOrDefault() ?? new T();
+        if(_mainWindow != null)
+        {
+            _mainWindow.MainContentControl.Content = window;
+        }
+    }
+
+    // الحصول على النافذة الرئيسية
     public static void GetBasePage()
     {
-        mainWindow = System.Windows.Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
+        _mainWindow = Application.Current.Windows.OfType<MainWindow>().FirstOrDefault();
     }
 }

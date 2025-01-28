@@ -111,6 +111,7 @@ public class Excel_ImporterViewModel : BaseViewModel
 
         // تحميل البيانات عند إنشاء ViewModel
         _ = LoadDataAsync();
+         LogInfoAsync("تم تهيئة Excel_ImporterViewModel بنجاح.");
     }
 
     public async Task LoadStatusFromExcelAsync()

@@ -80,6 +80,11 @@ public interface IDatabaseHelper : IDisposable
     Task<List<T>> GetFilteredRecordsAsync<T>(string tableName ,string filterColumn ,string filterValue) where T : class;
 
     /// <summary>
+    /// جلب سجلات مُصفاة من الجدول وتاريخ اليوم
+    /// </summary>
+    Task<IEnumerable<LinkedVisitDatasToSAPDatas>> GetFilteredLinkedDateRecordsAsync(string table1 ,string table2 ,string table3 ,string joinColumn ,string filterValue ,DateTime? createdOnDate = null);
+
+    /// <summary>
     /// جلب بيانات SAP مُصفاة.
     /// </summary>
     Task<List<SAPDataWithStatus>> GetFilteredSAPDataAsync();
